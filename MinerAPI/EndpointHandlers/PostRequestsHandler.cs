@@ -25,7 +25,7 @@ namespace MinerAPI.EndpointHandlers
             Game game = new Game(request.width, request.height, request.mines_count);
             Games.Add(game);
             if (Games.Count > 10)
-                Games.Remove(Games.Last());
+                Games.Remove(Games.First());
             return Results.Ok(game);
         }
 
@@ -37,9 +37,9 @@ namespace MinerAPI.EndpointHandlers
             if (request == null)
                 return Results.BadRequest(new ErrorResponse("Не удалось разобрать запрос."));
 
-            Game game = Games.SingleOrDefault(x => x.Game_id == request.Game_id);
+            Game game = Games.SingleOrDefault(x => x.Game_id == request.Game_id && x.Completed == false);
             if (game == null)
-                return Results.BadRequest(new ErrorResponse("Запрошенная игра не найдена."));
+                return Results.BadRequest(new ErrorResponse("Запрошенная игра не найдена или завершена."));
 
             return Results.Ok(game.GameTurn(request));
         }
