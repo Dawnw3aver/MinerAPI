@@ -1,0 +1,6 @@
+@MinerAPI_HostAddress = http://localhost:5200
+
+GET {{MinerAPI_HostAddress}}/
+Accept: application/json
+
+###
