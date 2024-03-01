@@ -37,7 +37,6 @@ namespace MinerAPI.Entities
             Width = width;
             Mines_Count = mines_count;
             SetupField();
-            //PrintField();
         }
         #endregion
 
@@ -93,18 +92,6 @@ namespace MinerAPI.Entities
             }
         }
 
-        private void PrintField()
-        {
-            foreach (var row in _field)
-            {
-                foreach (var item in row)
-                {
-                    Console.Write(item.GetCellValue() + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-
         public Game GameTurn(GameTurnRequest request)
         {
             Cell cell = _field[request.Row][request.Col];
@@ -125,41 +112,22 @@ namespace MinerAPI.Entities
 
         private bool HasHiddenEmptyCell()
         {
-            foreach (var row in _field)
-            {
-                foreach (var item in row)
-                {
-                    if (item.IsHidden && item.GetCellValue() != 'X')
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return _field.Any(row => row.Any(item => item.IsHidden && item.GetCellValue() != 'X'));
         }
 
         private void OpenZeroCells()
         {
-            foreach (var row in _field)
+            foreach (var item in _field.SelectMany(row => row).Where(item => item.IsHidden && item.GetCellValue() == '0'))
             {
-                foreach (var item in row)
-                {
-                    if (item.IsHidden == true && item.GetCellValue() == '0')
-                    {
-                        item.IsHidden = false;
-                    }
-                }
+                item.IsHidden = false;
             }
         }
 
         private void OpenAllCells()
         {
-            foreach (var row in _field)
+            foreach (var item in _field.SelectMany(row => row))
             {
-                foreach (var item in row)
-                {
-                    item.IsHidden = false;
-                }
+                item.IsHidden = false;
             }
         }
 
@@ -170,13 +138,9 @@ namespace MinerAPI.Entities
             {
                 Completed = true;
                 OpenAllCells();
-                foreach (var row1 in _field)
+                foreach (var item in _field.SelectMany(row => row).Where(i => i.GetCellValue() == 'X'))
                 {
-                    foreach (var item in row1)
-                    {
-                        if (item.GetCellValue() == 'X')
-                            item.Value = 'M';
-                    }
+                    item.Value = 'M';
                 }
             }
         }
